@@ -1,0 +1,61 @@
+//
+// 8 Channel Electromagnetic relay module board 5.0V 3.3V / 350mA
+//
+// I2C expander on PCF8574(A) chip
+//
+// Logic level "0" ON relay, logic level "1" OFF relay
+//
+// 1st channel ON - 0b01111111, OFF - 0b11111111
+// 2nd channel ON - 0b10111111, OFF - 0b11111111
+// 3rd channel ON - 0b11011111, OFF - 0b11111111
+// 4th channel ON - 0b11101111, OFF - 0b11111111
+//
+// Demo code for ARDUINO 
+//
+
+#include <Wire.h>
+
+#define address 0x27
+
+#define  ON 1
+#define OFF 0
+
+unsigned int FAST;
+unsigned char  mode_byte; 
+
+void setup() {
+  
+  Wire.begin(); 
+  FAST=500;
+
+}
+
+
+void ch_mode(unsigned char addr, unsigned char channel, unsigned char mode){   
+
+ switch (channel) { case 1 : channel =  7; break;
+                    case 2 : channel =  6; break;
+                    case 3 : channel =  5; break;
+                    case 4 : channel =  4; break; }
+
+ mode_byte &= ~(1<<(channel));
+ mode_byte |= mode<<channel;
+
+ Wire.beginTransmission(addr);             
+ Wire.write(~mode_byte);               
+ Wire.endTransmission();  
+                      
+}
+
+
+
+void loop() {
+
+    ch_mode(address,1,ON);  delay(FAST); ch_mode(address,1,OFF);  delay(FAST);   // Relay  #1 ON and after delay OFF
+    ch_mode(address,2,ON);  delay(FAST); ch_mode(address,2,OFF);  delay(FAST);   // Relay  #2 ON and after delay OFF
+    ch_mode(address,3,ON);  delay(FAST); ch_mode(address,3,OFF);  delay(FAST);   // Relay  #3 ON and after delay OFF
+    ch_mode(address,4,ON);  delay(FAST); ch_mode(address,4,OFF);  delay(FAST);   // Relay  #4 ON and after delay OFF
+    ch_mode(address,3,ON);  delay(FAST); ch_mode(address,3,OFF);  delay(FAST);   // Relay  #3 ON and after delay OFF
+    ch_mode(address,2,ON);  delay(FAST); ch_mode(address,2,OFF);  delay(FAST);   // Relay  #2 ON and after delay OFF
+    
+}
